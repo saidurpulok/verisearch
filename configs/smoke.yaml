@@ -1,0 +1,17 @@
+name: smoke
+output: runs/smoke
+data:
+  train_problems: 8
+  validation_problems: 4
+  test_problems: 4
+generation:
+  max_new_tokens: 64
+  candidates: 2
+  seeds: [17]
+  budgets: [64, 128]
+  temperatures: [0.6, 1.0]
+verifier:
+  batch_size: 2
+  max_length: 128
+  epochs: 1
+  fractions: [1.0]

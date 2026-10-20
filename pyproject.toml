@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "verisearch"
+version = "0.1.0"
+description = "Verifier-guided math reasoning under fixed inference budgets"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = "MIT"
+authors = [{name = "Saidur Rahman Pulok", email = "thisispulok77@gmail.com"}]
+dependencies = [
+  "torch==2.10.0", "transformers==4.57.1", "datasets>=3.6,<5",
+  "numpy>=2,<3", "matplotlib>=3.10,<4",
+  "pyyaml>=6,<7", "safetensors>=0.5", "sentencepiece>=0.2",
+]
+[project.scripts]
+verisearch = "verisearch.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8,<9", "ruff>=0.12", "mypy>=1.15", "types-PyYAML>=6"]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+environments = ["sys_platform == 'linux'"]
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu130"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = ["verisearch.generation.generator", "verisearch.verifier.model", "verisearch.verifier.train"]
+disallow_any_generics = false
+warn_return_any = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "gpu: real GPU integration (requires VERISEARCH_GPU_TESTS=1)",
+  "pretrained: requires downloaded public models",
+  "slow: long-running experiment",
+]

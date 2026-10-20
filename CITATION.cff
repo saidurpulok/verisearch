@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use VeriSearch, please cite this software repository."
+title: "VeriSearch: Verifier-Guided Reasoning Under Fixed Inference Budgets"
+type: software
+authors:
+  - family-names: "Pulok"
+    given-names: "Saidur Rahman"
+license: MIT
+version: 0.1.0
+date-released: 2026-10-03

@@ -1,0 +1,142 @@
+{
+  "timestamp_utc": "2026-10-03T13:37:55.836246+00:00",
+  "git_commit": "a507ffc5fdb36e55a54d9427318de75fad4a04e7",
+  "git_dirty": false,
+  "python": "3.13.13",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "config": {
+    "checkpoint": "distilbert/distilroberta-base",
+    "revision": "fb53ab8802853c8e4fbdbcd0529f21fc6f459b2b",
+    "device": "cuda",
+    "max_length": 384,
+    "batch_size": 8,
+    "epochs": 3,
+    "learning_rate": 2e-05,
+    "seed": 101,
+    "fractions": [
+      0.25,
+      0.5,
+      1.0
+    ]
+  },
+  "base_resolved_revision": "fb53ab8802853c8e4fbdbcd0529f21fc6f459b2b",
+  "train_balance": {
+    "candidates": 128,
+    "problems": 32,
+    "correct": 49,
+    "incorrect": 79,
+    "positive_fraction": 0.3828125
+  },
+  "validation_balance": {
+    "candidates": 128,
+    "problems": 32,
+    "correct": 53,
+    "incorrect": 75,
+    "positive_fraction": 0.4140625
+  },
+  "train_problem_ids": [
+    "gsm8k-01373d30bd3bc51671d45b7a82de6f6d5ab04543866f6cee6cad9047140aae55",
+    "gsm8k-0612b3732cab992e48fa70c530e6e1fa449c126f291a5671f797328c2a68f02e",
+    "gsm8k-1330837a96c6b5c20b471972d83bfae43169cad0c0c9ea66eb8215cd86fad32e",
+    "gsm8k-1d90b121eaa1ba277af9f940052aef06a8464b0e38a67db275932f58f5438996",
+    "gsm8k-1fe19a8f774978db2b31783e6fe88ec557931ca67c2a6abb27c397e6f19fa316",
+    "gsm8k-3080dd84b095bf565a9c3de7fc3b3285a5217a6822c797e80426b5a10a56b727",
+    "gsm8k-32c6b595ac61d864f4855bb0e58d21cde807fb5485f8a5d26bf5c73de7402cd9",
+    "gsm8k-3697a2db00b467edd74c88037e8e88bc5bd917cc003dda2f329b7a5c05351dae",
+    "gsm8k-51b23c7fef26cee8de2ace3b5b53797220fb9f86c68b0d89c1d74ef81bee3c83",
+    "gsm8k-5cf4c2a01a2e22cdb978806e5803100a59d321e7b04759b83ae64006a6062421",
+    "gsm8k-64f622100e97f832a0bd7db65fe2b69e015c0445b0106aa60584e08be6cba354",
+    "gsm8k-679d0634f8cd2df8cf468e135a4a0bd7374b53a69654bcceb1e1a5f88afe02c6",
+    "gsm8k-6a1193b5ca19701bda494508ee9e7de0481af2a93eee6c0692e2a2dc34907976",
+    "gsm8k-6f7904f2cc1c54aa044a3592872abb4819bed9b5d44b16ac0f912e32002d299e",
+    "gsm8k-7329fe313fb0884e1f5092fa9bd77312fd00768555887a2d5dd45b84778f800e",
+    "gsm8k-7ed30067678724524afd3e38dd20c79de2586fa48b2ae300ddcd4d26831214a8",
+    "gsm8k-8e863e062e3adf7129e4b5e7a9089e76f97a3f7bd4b14e39f498a149d50e68c7",
+    "gsm8k-a37ef70eeb27a1540a30cdfcbc725d4f066c2c39ab483ed690798f0eee4f9619",
+    "gsm8k-a4f37dfa27bdf38e0517789aac242c3f01c688c7f9c23fed964a5f0b801774dc",
+    "gsm8k-b3fc4cd1e4def40f5247d08693e140398a8c2af9bd15ce5c51c6423fc3a4d8bb",
+    "gsm8k-b48f83c7b7fe211b3bcb5800ebfaa5c10100f2acbefb20aefa2acafa7a9b7f28",
+    "gsm8k-b5834afb820654d2787d950a3bdf4988892122d7e125665797ed8e94513bd578",
+    "gsm8k-b5b66bdda52c32bb41c69dc388525a58a98677d2431b0b17c7166df88e37df8f",
+    "gsm8k-ba115fb3f833e8478aac672b67985ca83e2bce522cf806cd477d9877322ca4db",
+    "gsm8k-ba28ff5505db0033fe3666f39504d49fc82a8b472a03bc29cf959a3682256ca9",
+    "gsm8k-bad943d4213fa30cb8c10077a21022cef51189fb9feb882bab4f63b59dec8af5",
+    "gsm8k-bdb885a9c44719bd9b6b144305772126234bf5d8a3db92a31702f2eff8962d89",
+    "gsm8k-c30fd79a5d2a0f2ea48f4ff396d6ad13df6f6f986b27f64aeaa4040669771dea",
+    "gsm8k-c368433db0b3259b472a495f8e8d3ccce1897779c16132ff38fda54930e81332",
+    "gsm8k-c8d4c606231b3e836af0edecf8de2812785e6356114c7d6b81ed4dbddee1b029",
+    "gsm8k-e6ae3d692d70c41c3e57a7cd8f5f82a218a0e77ab7207858140152431668c3ee",
+    "gsm8k-fbabe404ed7c00923368b024c1aabc6de1fa0620ea3084794918917a5d2ca00e"
+  ],
+  "validation_problem_ids": [
+    "gsm8k-01a6cf219374d1109a32f56fbbed4b82a0f96ec67686fde8662f817e98a2401b",
+    "gsm8k-061e2404b73803904581030e90d54a9b4412c6c1a96ca875d0c8a164bd8d3547",
+    "gsm8k-06408a2c23e080a221d6d5be37dd711a70a2be7f7098e9e0c7a66d0a20cb21eb",
+    "gsm8k-069b56be1c69fb915437b7dce4441b5b7124eee58f832320faad5b012f9c4017",
+    "gsm8k-0da598236a4d9380d80cf88431af70271c45f576e420321fd4fa74f4a8840d1c",
+    "gsm8k-19b0d3572fbe195387361a1a345cc12e92caebdd689185c1cb4a59a7a2853db5",
+    "gsm8k-28ed8f2d579e4782a54f00b22f01a28e385f5088bafbd05b31654fe5c5d83337",
+    "gsm8k-30b6246b41b146bd384a6ab6fabcee585c64c8cda1dc6bbca939ff9b5670fa08",
+    "gsm8k-382818e4660c84ce39f4db87ff4974444fddb9409a3586303eeda8b8402db90c",
+    "gsm8k-39d76ba68f9f2bae73a17ffac45c741af5c9d92e3b569e4b99f2e33b1404edd5",
+    "gsm8k-3fe76a8d7aafdc6df30551aacf683d123eaaafbb0f2f1cf19b199e11e9392b2a",
+    "gsm8k-416569a77deb8f44e7440511d86b8d5205d8dd976b9669f6ea977617c1b156d7",
+    "gsm8k-445d153492ea042026b8627cc1d91d2562db3147e09fb62aab01e08a4c250913",
+    "gsm8k-563ae181989ef306a1414eac26a5408a5099d1d1f9b06571a42881fc251f0372",
+    "gsm8k-62106f3d2407470283c6af22dd85e1ef4463ce7f894d54fc389a2a0d78752e2b",
+    "gsm8k-6e5626c2c7915ba72fe9d919300bed61e1edc7f011dcf269bc89d3f4167928be",
+    "gsm8k-73bcb06b471e0460f313d86ba83c1ec9688f26287add9f16c12417996c0903b2",
+    "gsm8k-795592383837a89a268431b517ef782cd488cf7aceb0872d689610bed575a92f",
+    "gsm8k-7c7a6421bc0a77b74c3c1a83d527b5e1867caaebe5fcf97329116374946e880b",
+    "gsm8k-7d3add5804bb1dd7f92626c59407be52a75c1b8aa939a27642d38a4745d10db5",
+    "gsm8k-7e8c5b6e72e58aa3549d95edca96eb2a0f817b3f3244f4197a801e62376d0da2",
+    "gsm8k-88a2f3f9aee956b4b12d3eb42a0d88e1c5fc6eb2923896b6698a6b34b79567fc",
+    "gsm8k-9312f705307c1083c09924cdb099fa85c4a6cf7ae08b5a8fe403f658092fb28f",
+    "gsm8k-a88ec497192acf668236c66ffac1edfb98f414b5be7b572c6476618260fc6c4e",
+    "gsm8k-aace71f25886e6f6d42369c96771c8983205e3e000f4d2be7f6a5c8ffcc333ed",
+    "gsm8k-b05a2dc44ae1076c48d00e748b8dc15e81cbd8d9bc61cc0234a57c1460ca84a1",
+    "gsm8k-b8e8331a0b5efcd5f734f7f497347d74e3ba962cfa88f504f5411b0d70cf915e",
+    "gsm8k-dbb186bbc1eabcbe15ba4726195b180e2ea242743ea454c71b71cf6835c79ca8",
+    "gsm8k-dc8482dc259e200c13a7c163645ecae8b15a7d34e1d7a613eda6a1d327f3b384",
+    "gsm8k-e036f3b96819e606a9c73369a7d654c740c89baec0157ce120d6564b1d13e3f3",
+    "gsm8k-e307dc397261905d195bccbbae48af5a29e9594831b5b7d93a17599c6aaa813a",
+    "gsm8k-e823be781d03472b0c1f372e607ed3749cada7ae8d1590510e9f9b649f36b35c"
+  ],
+  "train_sha256": "0c12782da599c5b1ea99f54222808b3ce83e0fd43b0972125bde39cc2ef367aa",
+  "validation_sha256": "127d99d58b50f562e21ff66a735861f2b92821f074a91900de0a8dc73f40699b",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.6832743100821972,
+      "validation_loss": 0.6666715852916241
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5809960495680571,
+      "validation_loss": 0.32992920326069
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.20204235042911023,
+      "validation_loss": 0.008427822060184553
+    }
+  ],
+  "selection": "minimum validation cross-entropy",
+  "truncation": {
+    "train": {
+      "fraction_truncated": 0.0625,
+      "max_input_tokens": 417
+    },
+    "validation": {
+      "fraction_truncated": 0.0625,
+      "max_input_tokens": 406
+    }
+  },
+  "device": "cuda",
+  "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+  "torch": "2.10.0+cu130",
+  "cuda_runtime": "13.0",
+  "checkpoint_path": "runs/pilot/verifiers/fraction_0.25",
+  "weights_sha256": "249a7338415d7867d98db8464b656478252221bbb8760996aca0038b55b97af5",
+  "peak_allocated_mib": 1941.9638671875
+}

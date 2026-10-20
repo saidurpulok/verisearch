@@ -1,0 +1,80 @@
+{
+  "timestamp_utc": "2026-10-03T15:51:20.236319+00:00",
+  "git_commit": "22d7a7abbdff5d214e37413281a17af0cc0416cb",
+  "git_dirty": false,
+  "python": "3.13.13",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "config": {
+    "name": "pilot",
+    "output": "runs/pilot",
+    "data": {
+      "dataset": "openai/gsm8k",
+      "revision": "740312add88f781978c0658806c59bc2815b9866",
+      "split_seed": 42,
+      "train_problems": 128,
+      "validation_problems": 32,
+      "test_problems": 48
+    },
+    "generation": {
+      "checkpoint": "Qwen/Qwen2.5-Math-1.5B-Instruct",
+      "revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+      "device": "cuda",
+      "max_new_tokens": 256,
+      "candidates": 4,
+      "temperature": 0.8,
+      "top_p": 0.95,
+      "top_k": 50,
+      "seeds": [
+        17,
+        29
+      ],
+      "temperatures": [
+        0.6,
+        1.0
+      ],
+      "budgets": [
+        256,
+        512,
+        1024
+      ]
+    },
+    "verifier": {
+      "checkpoint": "distilbert/distilroberta-base",
+      "revision": "fb53ab8802853c8e4fbdbcd0529f21fc6f459b2b",
+      "device": "cuda",
+      "max_length": 384,
+      "batch_size": 8,
+      "epochs": 3,
+      "learning_rate": 2e-05,
+      "seed": 101,
+      "fractions": [
+        0.25,
+        0.5,
+        1.0
+      ]
+    },
+    "evaluation": {
+      "bootstrap_samples": 2000,
+      "bootstrap_seed": 2026,
+      "thresholds": [
+        0.5,
+        0.7,
+        0.9,
+        1.0
+      ],
+      "token_penalty": 0.02
+    }
+  },
+  "pools": 528,
+  "sha256": "4cd6d532494a4203a4759ec89864f7fb12cd65d44cbbf5424e64dbca034ef110",
+  "resolved_revision": "aafeb0fc6f22cbf0eaeed126eff8be45b0360a35",
+  "device": "cuda",
+  "hardware": {
+    "device": "cuda",
+    "torch": "2.10.0+cu130",
+    "cuda_runtime": "13.0",
+    "gpu": "NVIDIA GeForce RTX 5070 Laptop GPU",
+    "peak_allocated_mib": 2974.01806640625
+  },
+  "note": "Per-call synchronized latency; prefix replay costs, no batching."
+}

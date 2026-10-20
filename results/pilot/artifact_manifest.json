@@ -1,0 +1,33 @@
+{
+  "source": "runs/pilot",
+  "result_source_commit": "b502d2067ff026f3bd0409dd82f0bec17dcb692e",
+  "files_sha256": {
+    "config.json": "1d1d616ac4addb1e635e1c6928a1aeac8626ee236a46beef7dbedf8358d5e888",
+    "data/manifest.json": "f73425b5965f8559c33f57f4340d9f6691e7a91545cd4762c47c70093af9a608",
+    "decisions.jsonl.gz": "4a8e7fc1f89d7ac5418abaf00890d23a54fb79c3136447eae2a0caabdc2a604a",
+    "engineering_checks.json": "7f0552ebb4eb0e5c1dd262d1aacae5d29217d2c0c579c6863edc28a622d7492d",
+    "errors.md": "64a9a3fe7029cf4982945b614b326ec11df05f5dce04c1cc940afff4f2330ec5",
+    "fit_generation.json": "80c43b75a429de9b2295a963ef06d91ba5703a00ccd5ce87d8c5499d35de8a82",
+    "gpu_tests.xml": "457a83a2a2af54ee97f900b285f41ae3bbdf0b579631433f1f3cb57aabfdf74d",
+    "plots/accuracy_vs_budget.pdf": "d4b170611ea01f7625996cd7bbcbbfb738863aab0c9b0b913134478ed7e9ab9a",
+    "plots/accuracy_vs_budget.png": "5371e6afaedf827d8c2740f660ef5764b0486f59b636e80445494b947befee4a",
+    "plots/accuracy_vs_candidates.pdf": "7e44de339071ce6041bc9a3d965807f29d00169146db7f16a56ca80238bb3e03",
+    "plots/accuracy_vs_candidates.png": "93153f64ff318c96f1b76d58f7df81bfbe5a1a237921eba6f5283679d90d545f",
+    "plots/adaptive_accuracy_vs_tokens.pdf": "2132a08633051fd8288c763f1e746a59a927753fb7066cd7d06cb1f7eafb0ea7",
+    "plots/adaptive_accuracy_vs_tokens.png": "9c1dff0dcb772af2d6d39d90f6fe5aaf33c77c09fea487eed8aa4f9da9fec41d",
+    "plots/reliability.pdf": "4bc88df2ecc2309619d2ae1ba71292089a6578c40106aebfe7729cd0dbbf305c",
+    "plots/reliability.png": "0284d8db1edd50c014ad01e124d872b5f3204fbeb233db2275d4f90e29be4f9e",
+    "plots/score_distribution.pdf": "c9ccfd2c810a4d84a6ad7eff0001006c32ffff6c2a59de18bf3d6081c966284e",
+    "plots/score_distribution.png": "5454cd29153cf04c1959b294ea0dfa57eba806e240f6a9b3f94180490a767e6d",
+    "plots/training_size.pdf": "1733cff3ff75315d3078e49563c9f99c0b3dafb8eff675fa38b3e857b95bc22c",
+    "plots/training_size.png": "5d05bd2d177d3f5dc9353d8633c2e7d2b8fa2052e607d53d5c49bfe0e967fd03",
+    "results.json": "316240e339286e33f612a5c0aff4dd89bd34ed38b74b595755f5593b3e43dd30",
+    "test_generation.json": "1c406a87abbdd42333ae88ff251c1b600a14e808293044338863b6af80e2ba00",
+    "tuning.json": "9036e454f9c128fb46bac892341bb344f5938cf08735a73f9961ab28db3eb464",
+    "verifier_validation.json": "d0efc0fd6ea00d6953a69c6d9ff7207baec3363d1580ad37b943798ab8c33a37",
+    "verifiers/fraction_0.25/metadata.json": "02911989b31cebd25200d3d9aecf3ca3db85125a71ad740e67778b02de3f403e",
+    "verifiers/fraction_0.5/metadata.json": "8d3833fdb8fb2f75ed2f1f36663bf0a97467209a9c5e9b9b96e5375033fba5c6",
+    "verifiers/fraction_1/metadata.json": "2a87ed3c0b5aa2d1058df726adde5944706636eecbaf61bf004756c91d8cd92d"
+  },
+  "omitted": "Model weights, model caches, prepared questions and full trace pools. Failure examples and all policy decisions are included."
+}

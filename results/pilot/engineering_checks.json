@@ -1,0 +1,112 @@
+{
+  "timestamp_utc": "2026-10-03T16:27:08.143611+00:00",
+  "git_commit": "3df3e354162330d5ff269a30cc43c21be598959f",
+  "git_dirty": true,
+  "python": "3.13.13",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "checks": [
+    {
+      "command": [
+        ".venv/bin/pytest",
+        "-m",
+        "not gpu and not pretrained and not slow"
+      ],
+      "exit_code": 0,
+      "seconds": 4.95870231599838,
+      "output": "============================= test session starts ==============================\nplatform linux -- Python 3.13.13, pytest-8.4.2, pluggy-1.6.0\nrootdir: /home/saidur/experimentation/dl_lab/verisearch\nconfigfile: pyproject.toml\ntestpaths: tests\nplugins: anyio-4.15.1\ncollected 47 items / 1 deselected / 46 selected\n\ntests/integration/test_cli.py ...                                        [  6%]\ntests/unit/test_data.py .....................                            [ 52%]\ntests/unit/test_environment_reuse.py ..                                  [ 56%]\ntests/unit/test_experiment.py ......                                     [ 69%]\ntests/unit/test_generation.py ..                                         [ 73%]\ntests/unit/test_metrics.py ......                                        [ 86%]\ntests/unit/test_policies.py ......                                       [100%]\n\n======================= 46 passed, 1 deselected in 3.49s =======================\n"
+    },
+    {
+      "command": [
+        ".venv/bin/ruff",
+        "check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.01545576099306345,
+      "output": "All checks passed!\n"
+    },
+    {
+      "command": [
+        ".venv/bin/ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 0,
+      "seconds": 0.02230394999787677,
+      "output": "46 files already formatted\n"
+    },
+    {
+      "command": [
+        ".venv/bin/mypy",
+        "src"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5290182320022723,
+      "output": "Success: no issues found in 22 source files\n"
+    },
+    {
+      "command": [
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        ".venv/bin/python"
+      ],
+      "exit_code": 0,
+      "seconds": 0.11361179199593607,
+      "output": "Checked 83 packages in 13ms\nAll installed packages are compatible\n"
+    },
+    {
+      "command": [
+        "uv",
+        "build",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "seconds": 0.788580196996918,
+      "output": "Building source distribution...\nBuilding wheel from source distribution...\nSuccessfully built dist/verisearch-0.1.0.tar.gz\nSuccessfully built dist/verisearch-0.1.0-py3-none-any.whl\n"
+    }
+  ],
+  "source_files_sha256": {
+    "pyproject.toml": "574c7b3d37a6a700555e3d0b7002c882470058efe4e301917c196c61c52232d6",
+    "scripts/download_assets.py": "a36a488879e75d5bafdb79109cb737d77223d158ac0c506dcbcef0dd408088b0",
+    "scripts/export_cached_wheels.py": "e53b6fdd05d3c25e393ae3bb811a18e1026716691aef7dc2d1039e2990bd05e6",
+    "scripts/export_results.py": "e3eca30bb8b60c0fdcfc41230dd8454f1997d751ac746a6b1eecbbbf325d84dc",
+    "scripts/write_report.py": "9c245dc7daa4c4d171b3e0b2bf5c5d96fd1faa421698fb62ac3b2964ab5dc458",
+    "src/verisearch/__init__.py": "a2de06a7d728b0a142f9e9e64650ba7fcd44d43f56c912fe1332ed67c9a47400",
+    "src/verisearch/cli.py": "838294d4508ad69490d8ec37434543eb49e3377dfe45caf9f1de773494b15890",
+    "src/verisearch/config.py": "b30baa68185370bd217c741e24f2472918a0ecbe1300fb020a02dc7542dec436",
+    "src/verisearch/data/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/verisearch/data/load.py": "c079db68c241b4a2ac336826e3594914fcfdbeec215370df22e8f346b4cd2f3c",
+    "src/verisearch/data/schema.py": "9e34067773cd7c43a1b835c3ceef850b805d1a9ca48ddd59248f72380c49540f",
+    "src/verisearch/data/split.py": "6254d64f565aba27cebcbf86b462d635d674d3244a282094b7f5804c6e29f0a9",
+    "src/verisearch/evaluation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/verisearch/evaluation/error_analysis.py": "8d6b287a173749c21d8b4c47ce12e86623e4cdebc72d96d4d14ffa442bdbfe32",
+    "src/verisearch/evaluation/metrics.py": "8b59950bf2b31b05bf36079bf8934241c8c55ffe31a3ec0d4905ac058f0d6333",
+    "src/verisearch/evaluation/plot.py": "54fc82cb48c4443dbdaa66bf984f439e7ef4f6da58761b87e0574398ba7fab07",
+    "src/verisearch/experiment.py": "5464bb7d1494e0a6f4133154f39655585c2926f96bc987fce0322e315d540979",
+    "src/verisearch/generation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/verisearch/generation/answer_extraction.py": "2db72ccfabd759411c2bd66bf2c75fdf3d6cbcd6a64b9c3e7e6679ede5709659",
+    "src/verisearch/generation/generator.py": "051fc142ce1cc42431da93473f194e849cb6c67cacef358d54368c5b2f919c8f",
+    "src/verisearch/io.py": "5c74a671ab4c85627f0a1cde1a4cb77c7e1ad2204fe2fff4c1cdd6b98b21f175",
+    "src/verisearch/policies/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/verisearch/policies/selection.py": "4bef214d6f9d1bb7d0d47cdd54cd96f00bab4b0856a3ce6705b9d25a5822de9b",
+    "src/verisearch/verifier/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/verisearch/verifier/dataset.py": "c4060c10764e5a64bf501929e70ecd2f9a034e142af9cc2c703b0d91f4ae52be",
+    "src/verisearch/verifier/model.py": "6416d25a909a2ee01625d31d2e8c383e947fd0c0e6c02256147abce7a0691712",
+    "src/verisearch/verifier/train.py": "01704063659c2d6052e91e1d902c10c0b6db2215052ffd6a6c33ced55a9b9a25",
+    "tests/integration/test_cli.py": "49c421350e993f29e7975776bd2e256b41a225a203ebe914059c9a4701a34678",
+    "tests/integration/test_gpu.py": "8a2dd40602c188cc220646f6a42fa8e23fb61b2a61d8f7e257e463c330de48be",
+    "tests/unit/test_data.py": "034be2bacaa677ccfb0320d7bc44261645c51a44b6d4cc266529db00c5578edb",
+    "tests/unit/test_environment_reuse.py": "d080955cfc8213cd44ba80c2cfce8df3ce33717d02d979dd4ec0a3f4d030ef81",
+    "tests/unit/test_experiment.py": "ead63702860c16e0dec860be11985aaf90a7394e2d16ce358ddadd9854361907",
+    "tests/unit/test_generation.py": "e275ad34ba6d1d30e46e83fc3a9df4ca3b8e6f2e561d50e37adb1bdf0b90d792",
+    "tests/unit/test_metrics.py": "1e33b0c87266e2d563eeff6c270616c213811c46567cf2bc066c53f19cc26c88",
+    "tests/unit/test_policies.py": "428cdc3b4fc8ac422d624b627f35d26dd559b6c355a85c8f16a259083a35ac98",
+    "uv.lock": "aafa6633c6ccd80148dfe406c1643eed550283d995e6b591adeb381b4e036293"
+  },
+  "gpu_evidence": "gpu_tests.xml: actual pretrained CUDA test passed, zero skipped; generation/policy/scoring source unchanged since that validation",
+  "artifact_audit": "944 immutable pools and 6288 policy decisions verified for label/query/revision/token correctness; metrics/CIs/checkpoint and artifact hashes independently checked",
+  "hosted_ci": "not verified (read-only GitHub API returned404); CPU workflow exists and local checks passed"
+}
