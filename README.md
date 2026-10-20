@@ -2,62 +2,26 @@
 
 [![CPU checks](https://github.com/saidurpulok/verisearch/actions/workflows/ci.yml/badge.svg)](https://github.com/saidurpulok/verisearch/actions/workflows/ci.yml)
 
-**Verifier-Guided Reasoning Under Fixed Inference Budgets**
+**Can a small learned verifier pick better answers than majority voting when the
+token budget is fixed?** I tested this on GSM8K math problems with a 1.5B model,
+end to end on an 8 GB laptop GPU.
 
-VeriSearch is a local research implementation studying whether a learned outcome
-verifier can improve math answer selection over greedy decoding, sampling and
-self-consistency under generated-token caps. It is designed for an 8 GB laptop GPU
-and uses public models without paid APIs. v0.1 is a small empirical pilot,
-not a claim of algorithmic novelty.
+Short answer: not in this setup. The verifier tied with voting. Its overall
+AUROC of 0.96 came mostly from a shortcut it learned, and the shortcut was the
+most interesting finding. Adaptive early stopping did help: it used 35% fewer
+generated tokens for about one point of accuracy.
 
-## Pilot results
+## Why I built it
 
-The pilot was evaluated on an NVIDIA RTX 5070 Laptop GPU. At the 1024-token cap,
-on 48 official-test problems and two sampling seeds:
+Sampling several solutions and taking a majority vote (self-consistency) is a
+strong, cheap baseline for reasoning tasks. A verifier that scores each
+candidate should, in principle, do two things better. It should pick the right
+answer when the vote gets it wrong, and it should let you stop sampling early
+once it's confident. I wanted to see whether either holds up under a hard cap
+on generated tokens, on hardware I own, with everything measured rather than
+assumed.
 
-| Policy | Accuracy | Mean generated tokens |
-|---|---:|---:|
-| Greedy | 35.4% | 237.9 |
-| Self-consistency (up to 4) | 55.2% | 953.5 |
-| Learned verifier best-of-N | 54.2% | 953.5 |
-| Validation-tuned adaptive | 53.1% | 617.0 |
-
-The verifier did not consistently outperform voting. Adaptive replay consumed
-35.3% fewer generated tokens than full reranking with 1.04 percentage points less
-accuracy. The 48-problem pilot has wide confidence intervals and makes no
-significance or end-to-end speedup claim.
-
-Overall verifier AUROC was 0.9605, but AUROC **among extracted answers** was
-0.4695. Classification accuracy matched a trivial answer-presence classifier.
-These measurements do not establish mathematical verification.
-
-See [RESULTS.md](RESULTS.md), [validation evidence](docs/VALIDATION.md), and
-[tracked artifacts](results/README.md) for actual
-measurements and validation evidence. The central figures are
-answer accuracy vs token cap, accuracy vs candidate count, calibration,
-correct/incorrect score distributions and adaptive accuracy vs consumed tokens.
-Full traces and model checkpoints remain in ignored `runs/`; small summaries,
-manifests, plots and selected failure examples are versioned.
-
-The fit data is dominated by missing final answers (335 of 339 training negatives;
-all 75 validation negatives). The result report includes an answer-presence
-shortcut diagnostic; high verifier classification scores must not be read as
-proof of mathematical checking.
-
-This pilot cannot establish benchmark-wide improvements. It uses a small
-generator, small verifier dataset and short traces; exact-answer labels do not
-prove reasoning correctness. Pretraining contamination is not controlled.
-Verifier shortcuts, distribution shift, laptop latency variability and excluded
-scoring costs are material limitations. Read [LIMITATIONS](docs/LIMITATIONS.md).
-
-![Held-out answer accuracy versus generated-token budget](results/pilot/plots/accuracy_vs_budget.png)
-
-The dashed oracle curve is an analysis-only upper bound.
-[Adaptive stopping](results/pilot/plots/adaptive_accuracy_vs_tokens.png),
-[calibration](results/pilot/plots/reliability.png), and
-[all figures](results/pilot/plots/) are available with PDF exports.
-
-## Research pipeline
+## What I built
 
 ```mermaid
 flowchart LR
@@ -70,54 +34,89 @@ flowchart LR
   F --> G[Held-out accuracy / compute / calibration]
 ```
 
-The generator is [Qwen2.5-Math-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Math-1.5B-Instruct)
-through Hugging Face Transformers. The outcome verifier is
-[DistilRoBERTa](https://huggingface.co/distilbert/distilroberta-base), fully fine-tuned
-on question, extracted candidate answer and reasoning. It predicts **answer
-correctness**, not the validity of each reasoning step.
-[Official GSM8K](https://huggingface.co/datasets/openai/gsm8k) training problems
-supply disjoint verifier train/validation subsets; official test problems are
-reserved for final reporting. Revision hashes and question IDs are recorded.
+- **Generator:** [Qwen2.5-Math-1.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-Math-1.5B-Instruct)
+  run locally with Hugging Face Transformers. It samples candidate solutions,
+  and every call respects the remaining token budget.
+- **Verifier:** [DistilRoBERTa](https://huggingface.co/distilbert/distilroberta-base),
+  fully fine-tuned to predict whether a candidate's final answer is correct from
+  the question, the extracted answer and the reasoning.
+- **Selection policies:**
+  - greedy decoding and a single sample
+  - majority vote
+  - verifier best-of-N
+  - adaptive stopping, which stops sampling once the verifier is confident. Its
+    threshold is tuned on validation data only and frozen before the test run.
+- **Evaluation:**
+  - problem-level splits, so no test question leaks into training
+  - one shared candidate pool per condition, so every policy chooses from the same samples
+  - paired bootstrap confidence intervals and calibration metrics
+  - a failure analysis of the cases where the two policies disagree
 
-Implemented methods are greedy, one stochastic sample, majority-vote
-self-consistency, learned-verifier best-of-N, and sequential verifier-guided
-early stopping. Oracle any-correct selection is an analysis-only upper bound.
-Voting ignores missing answers; ties and verifier score ties prefer the earliest
-candidate. Adaptive stopping uses a threshold selected only on validation data;
-disabled stopping uses the entire available pool. Test gold never enters a
-generator, scorer input or deployable selector.
+## What I found
 
-Each generation call respects the remaining token budget. Comparable stochastic
-policies reuse the same capped pool. Encoder scoring, prompt prefill and model
-loading are excluded from the generated-token cap and must be considered when
-interpreting compute efficiency. Adaptive sweeps replay prefixes; the selector
-also supports a live lazy generator.
+On 48 held-out [GSM8K](https://huggingface.co/datasets/openai/gsm8k) test
+problems, averaged over two sampling seeds, at a 1024-token cap:
 
-## Setup
+| Policy | Accuracy | Mean generated tokens |
+|---|---:|---:|
+| Greedy | 35.4% | 237.9 |
+| Majority vote (up to 4 samples) | 55.2% | 953.5 |
+| Verifier best-of-N | 54.2% | 953.5 |
+| Adaptive early stopping | 53.1% | 617.0 |
 
-Python 3.11–3.13 and [uv](https://docs.astral.sh/uv/) are required. On WSL, install
-a current Windows NVIDIA driver supporting the GPU; the locked Torch wheel uses
-CUDA 13.0. No separately installed CUDA toolkit is required for these wheels.
-The environment/model cache uses several GB of disk. CPU unit tests require no
-downloaded models or accessible GPU; generation/training configs explicitly
-request CUDA and fail if unavailable rather than silently changing hardware.
+![Held-out answer accuracy versus generated-token budget](results/pilot/plots/accuracy_vs_budget.png)
+
+- **The verifier didn't beat voting.** At 1024 tokens it was one point behind,
+  and at 512 tokens it was one point ahead. Both gaps are within noise at this
+  sample size.
+- **Adaptive stopping saved tokens.** It used 35.3% fewer generated tokens than
+  scoring the full pool, and lost 1.04 points of accuracy.
+- **The verifier learned a shortcut.** In the training data, 335 of the 339
+  wrong candidates were ones that never reached a final answer. So the verifier
+  mostly learned whether an answer was present at all. That alone gives a
+  0.96 AUROC overall. Among candidates that did produce an answer, the AUROC was
+  0.47, no better than chance (although there were only nine wrong-but-present
+  answers in the test set). A high verifier score here doesn't mean the math was
+  checked.
+
+The full tables, confidence intervals and failure analysis are in
+[RESULTS.md](RESULTS.md). The [calibration](results/pilot/plots/reliability.png),
+[adaptive stopping](results/pilot/plots/adaptive_accuracy_vs_tokens.png) and
+[other figures](results/pilot/plots/) are in `results/pilot/plots/`, with PDF
+versions.
+
+## Limitations
+
+- The test set is small: 48 problems, two sampling seeds and one verifier
+  training seed, so the confidence intervals are wide.
+- It covers one generator, one dataset and short traces of up to 256 tokens each.
+- The token savings count generated tokens only. Verifier scoring, prompt prefill
+  and model loading aren't included, so they're not wall-clock speedups.
+- Labels check the final answer, not the reasoning, and pretraining
+  contamination isn't controlled.
+
+More detail is in [LIMITATIONS.md](docs/LIMITATIONS.md) and
+[METHODOLOGY.md](docs/METHODOLOGY.md).
+
+## What I'd try next
+
+- Train the verifier on wrong answers that are present (hard negatives) to
+  remove the shortcut.
+- Run the full 1,319-problem GSM8K test set.
+- Measure end-to-end latency, including the verifier's cost.
+- Compare against a step-level (process) verifier.
+
+## Run it yourself
+
+You need Python 3.11–3.13, [uv](https://docs.astral.sh/uv/) and an NVIDIA GPU
+for generation and training. The locked Torch build uses CUDA 13.0, and the CPU
+tests need neither a GPU nor downloaded models.
 
 ```bash
 uv sync --frozen --python 3.13
 export HF_HOME="$PWD/.cache/huggingface"
-export MPLCONFIGDIR="$PWD/.cache/matplotlib"
-export UV_CACHE_DIR="$HOME/.cache/uv"
 uv run python scripts/download_assets.py --config configs/pilot.yaml
-```
 
-The download helper preserves pinned revisions, resolves any `main` reference,
-and refuses to alter a config after data preparation. The committed pilot config
-has immutable revisions. A fresh experiment needs a new `output` path; the
-pipeline refuses destructive overwrites. Commands assume the repository root.
-
-## Reproduce the pilot
-
-```bash
 uv run verisearch data prepare --config configs/pilot.yaml
 uv run verisearch generate --config configs/pilot.yaml --partition fit
 uv run verisearch verifier train --config configs/pilot.yaml
@@ -128,51 +127,42 @@ uv run verisearch eval --config configs/pilot.yaml
 uv run verisearch plot --results runs/pilot/results.json --output runs/pilot/plots
 ```
 
-Alternatively run `bash scripts/run_experiment.sh configs/pilot.yaml` for the
-stages through evaluation. Reissuing an interrupted generation command resumes
-from atomically stored completed pools. Verifier training skips completed fraction
-checkpoints. Data preparation and frozen tuning are one-time stages.
+Or run `bash scripts/run_experiment.sh configs/pilot.yaml` to go through
+evaluation in one step. Interrupted generation resumes where it stopped. Each new
+experiment needs a new output path, because the pipeline won't overwrite
+results. `configs/smoke.yaml` is a smaller setup for quick checks, not a benchmark.
 
-Pilot: 128 training / 32 validation / 48 test problems; four candidates at
-temperature 0.8; 256 new tokens per trace; 256/512/1024 token caps; generation
-seeds 17/29. Required ablations cover candidate count, temperatures 0.6/1.0,
-nested 25/50/100% training-problem subsets, and stopping thresholds. The temperature
-ablation is first-seed-only; compare with the matching first-seed 0.8 result.
-`configs/smoke.yaml` is a smaller diagnostic setup, not a benchmark; training
-deliberately refuses single-class data and may require a larger smoke sample.
+The pilot setup was 128 training, 32 validation and 48 test problems, with four
+candidates per problem at temperature 0.8. Each trace was capped at 256 new
+tokens, with total caps of 256, 512 and 1024 tokens, and the sampling seeds were
+17 and 29. Ablations cover candidate count, temperature (0.6 and 1.0),
+verifier training-set size (25%, 50% and 100%) and the stopping threshold.
 
-## Checks
+Checks:
 
 ```bash
-uv run ruff check .
-uv run ruff format --check .
-uv run mypy src
+uv run ruff check . && uv run ruff format --check . && uv run mypy src
 uv run pytest -m "not gpu and not pretrained and not slow"
-VERISEARCH_GPU_TESTS=1 uv run pytest -m gpu
+VERISEARCH_GPU_TESTS=1 uv run pytest -m gpu   # needs a trained verifier
 ```
 
-The real GPU test additionally needs a trained verifier at the configured output.
-CPU tests cover exact extraction, query-level leakage, serialization, voting ties,
-gold-free ranking, lazy stopping, hard token caps, metrics, cluster bootstrap,
-frozen configs, CLI and error reporting. Markers distinguish real pretrained
-GPU integration from CPU correctness tests.
+## Repository layout
 
-## Repository map
+- `src/verisearch/data`: loading GSM8K and making problem-level splits
+- `src/verisearch/generation`: seeded local generation and numeric answer extraction
+- `src/verisearch/verifier`: the verifier's inputs, training and scoring
+- `src/verisearch/policies`: voting, ranking and adaptive stopping
+- `src/verisearch/evaluation`: metrics, bootstrap intervals, error reports and plots
+- `experiment.py`, `cli.py`: the staged pipeline and the command-line tool
+- `results/pilot/`: the measured results, plots and checksums from the pilot run
+- [Architecture](docs/ARCHITECTURE.md), [code guide](docs/CODE_GUIDE.md) and
+  [validation record](docs/VALIDATION.md)
 
-- `src/verisearch/data`: schemas, official loading and query-level splits.
-- `generation`: local generation, seeded decoding and conservative numeric parsing.
-- `verifier`: label-safe input, nested subsets, training and probability scoring.
-- `policies`: greedy/single, voting, ranking and lazy adaptive selection.
-- `evaluation`: metrics, problem bootstrap, error reports and exportable plots.
-- `experiment.py` and `cli.py`: saved-config, gated research workflow.
-- `configs/`, `tests/`, `results/`: experiment definitions, correctness evidence,
-  small measured artifacts.
-- [Architecture](docs/ARCHITECTURE.md), [Methodology](docs/METHODOLOGY.md),
-  [Code guide](docs/CODE_GUIDE.md).
+## References
 
-## Sources
-The project builds on [GSM8K](https://arxiv.org/abs/2110.14168),
-[self-consistency](https://arxiv.org/abs/2203.11171), and
+This project builds on [GSM8K](https://arxiv.org/abs/2110.14168),
+[self-consistency](https://arxiv.org/abs/2203.11171) and
 [Qwen2.5-Math](https://arxiv.org/abs/2409.12122).
-No result from those works is presented as a VeriSearch measurement.
-Code: MIT license. Dataset/model licenses remain with their original publishers.
+
+The code is under the MIT license. The dataset and model licenses stay with their
+publishers.
