@@ -29,7 +29,8 @@
     --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 12px; }
   body {
     margin: 0;
     background: var(--bg);
@@ -185,9 +186,9 @@
   <p class="meta"><span><a href="https://github.com/saidurpulok">Saidur Rahman Pulok</a></span><span>Independent project</span><span>GSM8K &middot; Qwen2.5-Math-1.5B</span><span>2026</span></p>
   <nav class="links">
     <a class="btn" href="https://github.com/saidurpulok/verisearch"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> Code</a>
-    <a class="btn ghost" href="https://github.com/saidurpulok/verisearch/blob/main/RESULTS.md"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14h13a.5.5 0 010 1h-13A1.5 1.5 0 010 13.5v-12a.5.5 0 011 0v12a.5.5 0 00.5.5zM4 11V7h2v4H4zm3.5 0V4h2v7h-2zM11 11V2h2v9h-2z"/></svg> Results</a>
-    <a class="btn ghost" href="https://github.com/saidurpulok/verisearch/blob/main/docs/METHODOLOGY.md"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1h7l3 3v10a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1zm1 5v1h8V6H4zm0 3v1h8V9H4zm0 3v1h5v-1H4z"/></svg> Methodology</a>
-    <a class="btn ghost" href="https://github.com/saidurpulok/verisearch/blob/main/results/pilot/errors.md"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1h12a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1zm1 2v3h4V3H3zm6 0v3h4V3H9zM3 8v5h10V8H3z"/></svg> Failure analysis</a>
+    <a class="btn ghost" href="#results"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14h13a.5.5 0 010 1h-13A1.5 1.5 0 010 13.5v-12a.5.5 0 011 0v12a.5.5 0 00.5.5zM4 11V7h2v4H4zm3.5 0V4h2v7h-2zM11 11V2h2v9h-2z"/></svg> Results</a>
+    <a class="btn ghost" href="#method"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1h7l3 3v10a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1zm1 5v1h8V6H4zm0 3v1h8V9H4zm0 3v1h5v-1H4z"/></svg> Method</a>
+    <a class="btn ghost" href="#shortcut"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1h12a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1zm1 2v3h4V3H3zm6 0v3h4V3H9zM3 8v5h10V8H3z"/></svg> Key finding</a>
   </nav>
 </header>
 </div>
@@ -217,7 +218,7 @@
     <p class="lead">On 48 held-out GSM8K test problems, the verifier tied with voting. Adaptive early stopping did help, using 35% fewer generated tokens for about one point of accuracy. The verifier's 0.96 AUROC came mostly from a shortcut: almost every wrong training candidate never reached a final answer, so the verifier learned whether an answer was present, not whether it was right. Among candidates that did produce an answer, its AUROC was 0.47, no better than chance. That shortcut is the most useful finding of the pilot.</p>
   </section>
 
-  <section class="wrap">
+  <section class="wrap" id="method">
     <h2>Method</h2>
     <div class="diagram">
       <svg viewBox="0 0 840 200" role="img" aria-label="VeriSearch pipeline: GSM8K problems are split by problem, the Qwen generator samples reasoning candidates, which are labelled by exact numeric answer and used to fine-tune an encoder verifier. Shared capped candidate pools feed best-of-N and adaptive selection, evaluated for held-out accuracy, compute and calibration.">
@@ -267,7 +268,7 @@
     <p class="tcap">Pilot setup: 128 train / 32 validation / 48 test problems; up to four candidates per problem at temperature 0.8; 256 new tokens per trace; total caps of 256, 512 and 1024 tokens; sampling seeds 17 and 29.</p>
   </section>
 
-  <section class="wrap">
+  <section class="wrap" id="results">
     <h2>Results</h2>
     <div class="table-wrap">
       <table>
@@ -281,7 +282,7 @@
         </tbody>
       </table>
     </div>
-    <p class="tcap"><b>Table 1.</b> Held-out GSM8K accuracy at a 1024-token cap, averaged over two sampling seeds. Intervals are 95% percentile bootstrap intervals over 2000 problem resamples. The oracle is an any-correct upper bound and cannot be deployed. All budgets and paired differences are in <a href="https://github.com/saidurpulok/verisearch/blob/main/RESULTS.md">RESULTS.md</a>.</p>
+    <p class="tcap"><b>Table 1.</b> Held-out GSM8K accuracy at a 1024-token cap, averaged over two sampling seeds. Intervals are 95% percentile bootstrap intervals over 2000 problem resamples. The oracle is an any-correct upper bound and cannot be deployed.</p>
 
     <ul class="findings">
       <li><b>The verifier didn't beat voting.</b> At 1024 tokens it was one point behind; at 512 tokens it was one point ahead. Both gaps are within noise at this sample size.</li>
@@ -300,7 +301,7 @@
     </div>
   </section>
 
-  <section class="wrap">
+  <section class="wrap" id="shortcut">
     <h2>The verifier learned a shortcut</h2>
     <p>In the training data, 335 of the 339 wrong candidates were ones that never reached a final answer. The verifier therefore mostly learned whether an answer was present at all. A trivial rule that scores 1 when an answer is extracted and 0 otherwise reaches 95.3% accuracy and 0.963 AUROC on the test traces, matching the learned verifier.</p>
     <div class="grid2">
@@ -349,7 +350,7 @@
         </ul>
       </div>
     </div>
-    <p class="note">This is a small, predeclared pilot, not a full benchmark evaluation. Full caveats are in <a href="https://github.com/saidurpulok/verisearch/blob/main/docs/LIMITATIONS.md">LIMITATIONS.md</a> and the validation record in <a href="https://github.com/saidurpulok/verisearch/blob/main/docs/VALIDATION.md">VALIDATION.md</a>.</p>
+    <p class="note">This is a small, predeclared pilot, not a full benchmark evaluation.</p>
   </section>
 
   <section class="wrap">
@@ -362,7 +363,7 @@ uv run python scripts/download_assets.py --config configs/pilot.yaml
 bash scripts/run_experiment.sh configs/pilot.yaml</code></pre>
   </section>
 
-  <section class="wrap">
+  <section class="wrap" id="citation">
     <h2>Citation</h2>
 <pre><code>@software{pulok2026verisearch,
   author  = {Pulok, Saidur Rahman},
@@ -376,7 +377,7 @@ bash scripts/run_experiment.sh configs/pilot.yaml</code></pre>
 </main>
 
 <footer class="wrap">
-  VeriSearch is released under the MIT License; dataset and model licenses stay with their publishers. &middot; <a href="https://github.com/saidurpulok/verisearch">github.com/saidurpulok/verisearch</a>
+  VeriSearch is released under the MIT License; dataset and model licenses stay with their publishers.
 </footer>
 
 </body>
