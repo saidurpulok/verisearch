@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VeriSearch</title>
+<meta name="description" content="VeriSearch: can a small learned verifier pick better answers than majority voting when the token budget is fixed? A GSM8K study with a 1.5B model on an 8 GB laptop GPU.">
+<meta name="author" content="Saidur Rahman Pulok">
+<meta property="og:title" content="VeriSearch: Verifier-Guided Reasoning Under Fixed Inference Budgets">
+<meta property="og:description" content="Can a small learned verifier pick better answers than majority voting when the token budget is fixed?">
+<meta property="og:type" content="website">
+<meta property="og:image" content="plots/accuracy_vs_budget.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-soft: #f6f7f9;
+    --ink: #1c1f24;
+    --ink-soft: #4a5260;
+    --ink-faint: #7a8291;
+    --rule: #e3e6eb;
+    --accent: #1f5fae;
+    --accent-soft: #e8f0fa;
+    --good: #1d7a4a;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --serif: "Source Serif 4", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16.5px/1.65 var(--sans);
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header { padding: 64px 0 28px; text-align: center; }
+  h1 {
+    font: 700 clamp(2.4rem, 6vw, 3.4rem)/1.1 var(--serif);
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+  }
+  .subtitle {
+    font: 400 clamp(1.1rem, 2.6vw, 1.35rem)/1.45 var(--serif);
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin: 0 auto 22px;
+  }
+  .authors { font-size: 1.05rem; margin: 0 0 4px; }
+  .affil { color: var(--ink-faint); font-size: 0.92rem; margin: 0 0 26px; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 18px; border-radius: 999px;
+    background: var(--ink); color: #fff; font-weight: 500; font-size: 0.95rem;
+  }
+  .btn:hover { background: #363b44; text-decoration: none; }
+  .btn svg { width: 17px; height: 17px; fill: currentColor; }
+
+  /* Sections */
+  section { padding: 34px 0; border-top: 1px solid var(--rule); }
+  h2 {
+    font: 600 1.7rem/1.2 var(--serif);
+    margin: 0 0 18px;
+    text-align: center;
+  }
+  h3 { font: 600 1.15rem/1.3 var(--serif); margin: 26px 0 8px; }
+  p { margin: 0 0 14px; }
+  .lead { text-align: justify; hyphens: auto; }
+
+  .tldr {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    margin: 6px 0 4px;
+  }
+  .stat {
+    background: var(--bg-soft); border: 1px solid var(--rule);
+    border-radius: 10px; padding: 16px 16px 14px; text-align: center;
+  }
+  .stat .num { font: 700 1.9rem/1.1 var(--serif); color: var(--accent); }
+  .stat .lbl { font-size: 0.88rem; color: var(--ink-soft); margin-top: 6px; line-height: 1.4; }
+
+  figure { margin: 22px 0; }
+  figure img { width: 100%; height: auto; display: block; border-radius: 6px; border: 1px solid var(--rule); background: #fff; }
+  figcaption { font-size: 0.9rem; color: var(--ink-soft); margin-top: 10px; line-height: 1.5; }
+  figcaption b { color: var(--ink); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid2 figure { margin: 0; }
+
+  /* Diagram */
+  .diagram { overflow-x: auto; background: var(--bg-soft); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 10px; }
+  .diagram svg { min-width: 640px; width: 100%; height: auto; display: block; }
+  .diagram text { font-family: var(--sans); }
+
+  .states {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 8px; margin: 18px 0 6px; font: 500 0.82rem var(--mono);
+  }
+  .states span.s { padding: 4px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); }
+  .states span.a { color: var(--ink-faint); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 10px 0 6px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+  th, td { padding: 9px 12px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+  thead th { border-bottom: 2px solid var(--ink); font-weight: 600; white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: 2px solid var(--ink); }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.best { font-weight: 700; color: var(--good); }
+  .tcap { font-size: 0.88rem; color: var(--ink-soft); margin-top: 8px; }
+
+  ul.findings { padding-left: 1.2em; margin: 14px 0 0; }
+  ul.findings li { margin-bottom: 9px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .two-col ul { padding-left: 1.15em; margin: 0; }
+  .two-col li { margin-bottom: 7px; font-size: 0.95rem; }
+
+  pre {
+    background: var(--bg-soft); border: 1px solid var(--rule); border-radius: 8px;
+    padding: 14px 16px; overflow-x: auto; font: 0.84rem/1.6 var(--mono); margin: 10px 0 16px;
+  }
+  code { font-family: var(--mono); font-size: 0.88em; }
+  p code, li code, td code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 0.93rem; margin: 18px 0 0;
+  }
+
+  footer { border-top: 1px solid var(--rule); padding: 28px 0 48px; text-align: center; color: var(--ink-faint); font-size: 0.86rem; }
+
+  @media (max-width: 680px) {
+    header { padding-top: 40px; }
+    .tldr { grid-template-columns: 1fr; }
+    .grid2, .two-col { grid-template-columns: 1fr; }
+    .lead { text-align: left; }
+    .wrap { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="wrap">
+  <h1>VeriSearch</h1>
+  <p class="subtitle">Verifier-guided reasoning under fixed inference budgets: can a small learned verifier pick better answers than majority voting when the token budget is capped?</p>
+  <p class="authors"><a href="https://github.com/saidurpulok">Saidur Rahman Pulok</a></p>
+  <p class="affil">Independent project &middot; v0.1 pilot &middot; 2026</p>
+  <nav class="links">
+    <a class="btn" href="https://github.com/saidurpulok/verisearch"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> Code</a>
+    <a class="btn" href="https://github.com/saidurpulok/verisearch/blob/main/RESULTS.md"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14h13a.5.5 0 010 1h-13A1.5 1.5 0 010 13.5v-12a.5.5 0 011 0v12a.5.5 0 00.5.5zM4 11V7h2v4H4zm3.5 0V4h2v7h-2zM11 11V2h2v9h-2z"/></svg> Results</a>
+    <a class="btn" href="https://github.com/saidurpulok/verisearch/blob/main/docs/METHODOLOGY.md"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1h7l3 3v10a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1zm1 5v1h8V6H4zm0 3v1h8V9H4zm0 3v1h5v-1H4z"/></svg> Methodology</a>
+    <a class="btn" href="https://github.com/saidurpulok/verisearch/blob/main/results/pilot/errors.md"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1h12a1 1 0 011 1v12a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1zm1 2v3h4V3H3zm6 0v3h4V3H9zM3 8v5h10V8H3z"/></svg> Failure analysis</a>
+  </nav>
+</header>
+
+<main>
+  <section class="wrap">
+    <div class="tldr">
+      <div class="stat"><div class="num">54.2% vs 55.2%</div><div class="lbl">verifier best-of-N vs majority vote<br>at a 1024-token cap: a tie</div></div>
+      <div class="stat"><div class="num">&minus;35%</div><div class="lbl">generated tokens with adaptive stopping,<br>for about one point of accuracy</div></div>
+      <div class="stat"><div class="num">0.96 &rarr; 0.47</div><div class="lbl">verifier AUROC overall vs. among<br>candidates that produced an answer</div></div>
+    </div>
+    <figure style="max-width:760px;margin-left:auto;margin-right:auto">
+      <img src="plots/accuracy_vs_budget.png" alt="Held-out answer accuracy versus generated-token cap for each selection policy" width="1280" height="800">
+      <figcaption><b>Figure 1.</b> Held-out GSM8K accuracy against the generated-token cap per problem, averaged over two sampling seeds, with 95% bootstrap intervals. Majority vote, verifier best-of-N and adaptive stopping track each other closely and sit near the analysis-only oracle upper bound.</figcaption>
+    </figure>
+  </section>
+
+  <section class="wrap">
+    <h2>Abstract</h2>
+    <p class="lead">Sampling several solutions and taking a majority vote (self-consistency) is a strong, cheap baseline for reasoning tasks. A verifier that scores each candidate should, in principle, do two things better: pick the right answer when the vote gets it wrong, and let sampling stop early once it is confident. VeriSearch tests whether either holds up under a hard cap on generated tokens, end to end on an 8&nbsp;GB laptop GPU, with Qwen2.5-Math-1.5B-Instruct as the generator and a fully fine-tuned DistilRoBERTa verifier.</p>
+    <p class="lead">On 48 held-out GSM8K test problems, the verifier tied with voting. Adaptive early stopping did help, using 35% fewer generated tokens for about one point of accuracy. The verifier's 0.96 AUROC came mostly from a shortcut: almost every wrong training candidate never reached a final answer, so the verifier learned whether an answer was present, not whether it was right. Among candidates that did produce an answer, its AUROC was 0.47, no better than chance. That shortcut is the most useful finding of the pilot.</p>
+  </section>
+
+  <section class="wrap">
+    <h2>Method</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 840 200" role="img" aria-label="VeriSearch pipeline: GSM8K problems are split by problem, the Qwen generator samples reasoning candidates, which are labelled by exact numeric answer and used to fine-tune an encoder verifier. Shared capped candidate pools feed best-of-N and adaptive selection, evaluated for held-out accuracy, compute and calibration.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0L10 5L0 10z" fill="#7a8291"/>
+          </marker>
+          <style>
+            .bx { fill:#fff; stroke:#c9ced6; stroke-width:1.2; }
+            .bx.k { fill:#e8f0fa; stroke:#1f5fae; }
+            .t { font-size:13px; font-weight:600; fill:#1c1f24; text-anchor:middle; }
+            .st { font-size:11px; fill:#4a5260; text-anchor:middle; }
+            .ln { stroke:#7a8291; stroke-width:1.4; fill:none; marker-end:url(#ar); }
+          </style>
+        </defs>
+        <rect class="bx" x="10" y="72" width="120" height="56" rx="8"/>
+        <text class="t" x="70" y="97">GSM8K</text><text class="st" x="70" y="114">problem-level splits</text>
+        <rect class="bx k" x="165" y="72" width="140" height="56" rx="8"/>
+        <text class="t" x="235" y="97">Generator</text><text class="st" x="235" y="114">Qwen2.5-Math-1.5B</text>
+        <rect class="bx" x="345" y="14" width="140" height="56" rx="8"/>
+        <text class="t" x="415" y="39">Answer labels</text><text class="st" x="415" y="56">exact numeric match</text>
+        <rect class="bx k" x="520" y="14" width="140" height="56" rx="8"/>
+        <text class="t" x="590" y="39">Verifier</text><text class="st" x="590" y="56">DistilRoBERTa, fine-tuned</text>
+        <rect class="bx" x="345" y="130" width="140" height="56" rx="8"/>
+        <text class="t" x="415" y="155">Candidate pools</text><text class="st" x="415" y="172">shared, token-capped</text>
+        <rect class="bx k" x="520" y="130" width="140" height="56" rx="8"/>
+        <text class="t" x="590" y="155">Selection policies</text><text class="st" x="590" y="172">vote, verifier, early stop</text>
+        <rect class="bx" x="695" y="130" width="135" height="56" rx="8"/>
+        <text class="t" x="762" y="155">Evaluation</text><text class="st" x="762" y="172">accuracy, tokens, ECE</text>
+        <path class="ln" d="M130 100H161"/>
+        <path class="ln" d="M305 92L341 52"/><path class="ln" d="M305 108L341 150"/>
+        <path class="ln" d="M485 42H516"/><path class="ln" d="M485 158H516"/>
+        <path class="ln" d="M590 70V126"/><path class="ln" d="M660 158H691"/>
+      </svg>
+    </div>
+
+    <div class="two-col" style="margin-top:24px">
+      <ul>
+        <li><b>Generator:</b> Qwen2.5-Math-1.5B-Instruct, run locally with Transformers. Every sampling call respects the remaining token budget.</li>
+        <li><b>Verifier:</b> DistilRoBERTa, fully fine-tuned to predict whether a candidate's final answer is correct from the question, the extracted answer and the reasoning.</li>
+      </ul>
+      <ul>
+        <li><b>Policies:</b> greedy, single sample, majority vote, verifier best-of-N, and adaptive stopping whose threshold is tuned on validation only and frozen before the test run.</li>
+        <li><b>Evaluation:</b> problem-level splits, one shared candidate pool per condition, paired bootstrap intervals, calibration metrics and a failure analysis of disagreements.</li>
+      </ul>
+    </div>
+    <p class="tcap">Pilot setup: 128 train / 32 validation / 48 test problems; up to four candidates per problem at temperature 0.8; 256 new tokens per trace; total caps of 256, 512 and 1024 tokens; sampling seeds 17 and 29.</p>
+  </section>
+
+  <section class="wrap">
+    <h2>Results</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Policy</th><th class="n">Accuracy [95% CI]</th><th class="n">Mean generated tokens</th><th class="n">Mean candidates</th></tr></thead>
+        <tbody>
+          <tr><td>Greedy</td><td class="n">35.4% [22.9, 50.0]</td><td class="n">237.9</td><td class="n">1.00</td></tr>
+          <tr><td>Majority vote</td><td class="n best">55.2% [41.7, 67.7]</td><td class="n">953.5</td><td class="n">4.00</td></tr>
+          <tr><td>Verifier best-of-N</td><td class="n">54.2% [41.7, 66.7]</td><td class="n">953.5</td><td class="n">4.00</td></tr>
+          <tr><td>Adaptive early stopping</td><td class="n">53.1% [40.6, 65.6]</td><td class="n best">617.0</td><td class="n">2.49</td></tr>
+          <tr><td style="color:var(--ink-faint)">Oracle (analysis only)</td><td class="n" style="color:var(--ink-faint)">55.2% [41.7, 67.7]</td><td class="n" style="color:var(--ink-faint)">953.5</td><td class="n" style="color:var(--ink-faint)">4.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="tcap"><b>Table 1.</b> Held-out GSM8K accuracy at a 1024-token cap, averaged over two sampling seeds. Intervals are 95% percentile bootstrap intervals over 2000 problem resamples. The oracle is an any-correct upper bound and cannot be deployed. All budgets and paired differences are in <a href="https://github.com/saidurpulok/verisearch/blob/main/RESULTS.md">RESULTS.md</a>.</p>
+
+    <ul class="findings">
+      <li><b>The verifier didn't beat voting.</b> At 1024 tokens it was one point behind; at 512 tokens it was one point ahead. Both gaps are within noise at this sample size.</li>
+      <li><b>Adaptive stopping saved tokens.</b> It used 35.3% fewer generated tokens than scoring the full pool and lost 1.04 points of accuracy.</li>
+    </ul>
+
+    <div class="grid2" style="margin-top:22px">
+      <figure>
+        <img src="plots/adaptive_accuracy_vs_tokens.png" alt="Adaptive stopping accuracy versus consumed tokens" width="1280" height="800" loading="lazy">
+        <figcaption><b>Figure 2.</b> Adaptive stopping: accuracy against mean consumed tokens. The threshold was frozen on validation data before any test generation.</figcaption>
+      </figure>
+      <figure>
+        <img src="plots/accuracy_vs_candidates.png" alt="Accuracy versus number of candidates" width="1280" height="800" loading="lazy">
+        <figcaption><b>Figure 3.</b> Accuracy against the number of sampled candidates for each selection policy.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <h2>The verifier learned a shortcut</h2>
+    <p>In the training data, 335 of the 339 wrong candidates were ones that never reached a final answer. The verifier therefore mostly learned whether an answer was present at all. A trivial rule that scores 1 when an answer is extracted and 0 otherwise reaches 95.3% accuracy and 0.963 AUROC on the test traces, matching the learned verifier.</p>
+    <div class="grid2">
+      <figure>
+        <img src="plots/score_distribution.png" alt="Verifier score distributions for correct and incorrect candidates" width="1200" height="800" loading="lazy">
+        <figcaption><b>Figure 4.</b> Verifier scores are almost perfectly bimodal. The nine incorrect candidates with an extracted answer land in the same high-confidence bin as the correct ones.</figcaption>
+      </figure>
+      <figure>
+        <img src="plots/reliability.png" alt="Verifier reliability diagram" width="1000" height="800" loading="lazy">
+        <figcaption><b>Figure 5.</b> Reliability diagram. Calibration looks good overall (ECE 0.047, Brier 0.047), which hides the failure on answer-bearing candidates.</figcaption>
+      </figure>
+    </div>
+    <div class="table-wrap" style="margin-top:18px">
+      <table>
+        <thead><tr><th>Test traces</th><th class="n">Count</th><th class="n">Verifier AUROC</th></tr></thead>
+        <tbody>
+          <tr><td>All candidates</td><td class="n">192</td><td class="n">0.961</td></tr>
+          <tr><td>&nbsp;&nbsp;Extracted and correct</td><td class="n">71</td><td class="n" rowspan="2" style="vertical-align:middle">0.470</td></tr>
+          <tr><td>&nbsp;&nbsp;Extracted and incorrect</td><td class="n">9</td></tr>
+          <tr><td>&nbsp;&nbsp;No extracted answer</td><td class="n">112</td><td class="n">&ndash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">A high verifier score here does not mean the math was checked. With only nine wrong-but-present answers in the test set, the 0.47 figure is itself imprecise, but it shows the overall AUROC is not evidence of verification.</p>
+  </section>
+
+  <section class="wrap">
+    <h2>Limitations and next steps</h2>
+    <div class="two-col">
+      <div>
+        <h3 style="margin-top:0">Limitations</h3>
+        <ul>
+          <li>Small test set: 48 problems, two sampling seeds and one verifier training seed, so intervals are wide.</li>
+          <li>One generator, one dataset and short traces of up to 256 tokens each.</li>
+          <li>Token savings count generated tokens only; verifier scoring, prompt prefill and model loading are excluded, so they are not wall-clock speedups.</li>
+          <li>Labels check the final answer, not the reasoning, and pretraining contamination is not controlled.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-top:0">What comes next</h3>
+        <ul>
+          <li>Train the verifier on wrong answers that are present (hard negatives) to remove the shortcut.</li>
+          <li>Run the full 1,319-problem GSM8K test set.</li>
+          <li>Measure end-to-end latency, including the verifier's cost.</li>
+          <li>Compare against a step-level (process) verifier.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">This is a small, predeclared pilot, not a full benchmark evaluation. Full caveats are in <a href="https://github.com/saidurpulok/verisearch/blob/main/docs/LIMITATIONS.md">LIMITATIONS.md</a> and the validation record in <a href="https://github.com/saidurpulok/verisearch/blob/main/docs/VALIDATION.md">VALIDATION.md</a>.</p>
+  </section>
+
+  <section class="wrap">
+    <h2>Run it</h2>
+    <p>Requires Python 3.11&ndash;3.13, <a href="https://docs.astral.sh/uv/">uv</a> and an NVIDIA GPU for generation and training. CPU tests need neither a GPU nor downloaded models.</p>
+<pre><code>git clone https://github.com/saidurpulok/verisearch && cd verisearch
+uv sync --frozen --python 3.13
+export HF_HOME="$PWD/.cache/huggingface"
+uv run python scripts/download_assets.py --config configs/pilot.yaml
+bash scripts/run_experiment.sh configs/pilot.yaml</code></pre>
+  </section>
+
+  <section class="wrap">
+    <h2>Citation</h2>
+<pre><code>@software{pulok2026verisearch,
+  author  = {Pulok, Saidur Rahman},
+  title   = {VeriSearch: Verifier-Guided Reasoning Under Fixed Inference Budgets},
+  year    = {2026},
+  version = {0.1.0},
+  url     = {https://github.com/saidurpulok/verisearch}
+}</code></pre>
+    <p class="tcap">Builds on <a href="https://arxiv.org/abs/2110.14168">GSM8K</a>, <a href="https://arxiv.org/abs/2203.11171">self-consistency</a> and <a href="https://arxiv.org/abs/2409.12122">Qwen2.5-Math</a>.</p>
+  </section>
+</main>
+
+<footer class="wrap">
+  VeriSearch is released under the MIT License; dataset and model licenses stay with their publishers. &middot; <a href="https://github.com/saidurpulok/verisearch">github.com/saidurpulok/verisearch</a>
+</footer>
+
+</body>
+</html>
